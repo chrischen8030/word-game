@@ -1,6 +1,8 @@
 import type { LearningRecordMap } from '../../domain/entities/LearningRecord'
 import type { Word } from '../../domain/entities/Word'
+import type { DifficultyLevel } from '../../domain/valueObjects/DifficultyLevel'
 import type { GameMode } from '../../domain/valueObjects/GameMode'
+import { getWordLevelRangeByDifficulty } from '../../domain/valueObjects/DifficultyLevel'
 import { pickRandomUnique, shuffleArray } from '../utils/random'
 
 /**
@@ -9,6 +11,7 @@ import { pickRandomUnique, shuffleArray } from '../utils/random'
 export interface SelectRoundWordsInput {
   mode: GameMode
   count: number
+  difficulty: DifficultyLevel
   words: Word[]
   records: LearningRecordMap
 }
@@ -20,6 +23,7 @@ export interface SelectRoundWordsOutput {
   words: Word[]
   fallbackUsed: boolean
   repeatedUsed: boolean
+  difficultyFallbackUsed: boolean
 }
 
 /**
@@ -46,6 +50,15 @@ function splitWordPools(words: Word[], records: LearningRecordMap): { learned: W
   }
 
   return { learned, unlearned }
+}
+
+/**
+ * 根据难度过滤词池。
+ */
+function filterWordsByDifficulty(words: Word[], difficulty: DifficultyLevel): Word[] {
+  const { minInclusive, maxExclusive } = getWordLevelRangeByDifficulty(difficulty)
+
+  return words.filter((word) => word.level >= minInclusive && word.level < maxExclusive)
 }
 
 /**
@@ -79,7 +92,10 @@ function fillToTargetCount(baseWords: Word[], allWords: Word[], targetCount: num
  */
 export function selectRoundWords(input: SelectRoundWordsInput): SelectRoundWordsOutput {
   const safeCount = Math.max(1, Math.floor(input.count))
-  const { learned, unlearned } = splitWordPools(input.words, input.records)
+  const wordsByDifficulty = filterWordsByDifficulty(input.words, input.difficulty)
+  const candidateWords = wordsByDifficulty.length > 0 ? wordsByDifficulty : input.words
+  const difficultyFallbackUsed = wordsByDifficulty.length <= 0
+  const { learned, unlearned } = splitWordPools(candidateWords, input.records)
 
   let selected: Word[] = []
   let fallbackUsed = false
@@ -104,11 +120,12 @@ export function selectRoundWords(input: SelectRoundWordsInput): SelectRoundWords
     }
   }
 
-  const { words, repeatedUsed } = fillToTargetCount(selected, input.words, safeCount)
+  const { words, repeatedUsed } = fillToTargetCount(selected, candidateWords, safeCount)
 
   return {
     words,
     fallbackUsed,
-    repeatedUsed
+    repeatedUsed,
+    difficultyFallbackUsed
   }
 }

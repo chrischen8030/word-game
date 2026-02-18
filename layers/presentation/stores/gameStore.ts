@@ -2,6 +2,10 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { buildBoardCards } from '../../application/usecases/BuildBoardCardsUseCase'
 import {
+  buildDifficultyProgress,
+  estimateUserDifficulty
+} from '../../application/usecases/BuildDifficultyProgressUseCase'
+import {
   buildStatistics,
   type StatisticsFilter,
   type StatisticsSortKey,
@@ -16,6 +20,7 @@ import type { RoundResult } from '../../domain/entities/RoundResult'
 import type { Word } from '../../domain/entities/Word'
 import type { ILearningRecordRepository } from '../../domain/repositories/ILearningRecordRepository'
 import type { IWordRepository } from '../../domain/repositories/IWordRepository'
+import { DEFAULT_DIFFICULTY_LEVEL, type DifficultyLevel } from '../../domain/valueObjects/DifficultyLevel'
 import type { GameMode } from '../../domain/valueObjects/GameMode'
 import { StaticWordRepository } from '../../infrastructure/data/StaticWordRepository'
 import { LocalStorageLearningRecordRepository } from '../../infrastructure/storage/LocalStorageLearningRecordRepository'
@@ -34,6 +39,7 @@ type RoundStatus = 'idle' | 'playing' | 'finished'
 interface LastRoundConfig {
   mode: GameMode
   count: number
+  difficulty: DifficultyLevel
 }
 
 /**
@@ -48,6 +54,7 @@ export const useGameStore = defineStore('game-store', () => {
 
   const mode = ref<GameMode>('newbie')
   const requestedCount = ref<number>(10)
+  const difficulty = ref<DifficultyLevel>(DEFAULT_DIFFICULTY_LEVEL)
 
   const status = ref<RoundStatus>('idle')
   const roundStartedAt = ref<string | null>(null)
@@ -70,6 +77,12 @@ export const useGameStore = defineStore('game-store', () => {
 
   /** 总题库数量。 */
   const totalWordCount = computed(() => words.value.length)
+
+  /** 按难度统计学习进度。 */
+  const difficultyProgress = computed(() => buildDifficultyProgress(words.value, records.value))
+
+  /** 用户当前估算学习等级。 */
+  const userDifficultyLevel = computed(() => estimateUserDifficulty(difficultyProgress.value))
 
   /** 当前局总配对数。 */
   const totalPairs = computed(() => roundWords.value.length)
@@ -127,15 +140,16 @@ export const useGameStore = defineStore('game-store', () => {
   }
 
   /**
-   * 根据模式和数量开始新游戏。
+   * 根据模式、数量和难度开始新游戏。
    */
-  function startRound(nextMode: GameMode, nextCount: number): void {
+  function startRound(nextMode: GameMode, nextCount: number, nextDifficulty: DifficultyLevel): void {
     ensureInitialized()
 
     const resolvedCount = Math.max(1, Math.floor(nextCount))
     const selection = selectRoundWords({
       mode: nextMode,
       count: resolvedCount,
+      difficulty: nextDifficulty,
       words: words.value,
       records: records.value
     })
@@ -151,8 +165,13 @@ export const useGameStore = defineStore('game-store', () => {
       notices.push('可用唯一单词不足，已允许重复出题。')
     }
 
+    if (selection.difficultyFallbackUsed) {
+      notices.push('当前难度词条不足，已临时使用全题库出题。')
+    }
+
     mode.value = nextMode
     requestedCount.value = resolvedCount
+    difficulty.value = nextDifficulty
     status.value = 'playing'
     roundStartedAt.value = new Date().toISOString()
     roundWords.value = selection.words
@@ -165,7 +184,8 @@ export const useGameStore = defineStore('game-store', () => {
 
     lastRoundConfig.value = {
       mode: nextMode,
-      count: resolvedCount
+      count: resolvedCount,
+      difficulty: nextDifficulty
     }
   }
 
@@ -309,6 +329,7 @@ export const useGameStore = defineStore('game-store', () => {
 
     roundResult.value = {
       mode: mode.value,
+      difficulty: difficulty.value,
       requestedCount: requestedCount.value,
       correctPairs: totalPairs.value,
       startedAt: started.toISOString(),
@@ -346,7 +367,7 @@ export const useGameStore = defineStore('game-store', () => {
       return false
     }
 
-    startRound(lastRoundConfig.value.mode, lastRoundConfig.value.count)
+    startRound(lastRoundConfig.value.mode, lastRoundConfig.value.count, lastRoundConfig.value.difficulty)
     return true
   }
 
@@ -361,6 +382,7 @@ export const useGameStore = defineStore('game-store', () => {
   return {
     mode,
     requestedCount,
+    difficulty,
     status,
     roundNotice,
     roundWords,
@@ -372,6 +394,8 @@ export const useGameStore = defineStore('game-store', () => {
     roundResult,
     learnedWordCount,
     totalWordCount,
+    difficultyProgress,
+    userDifficultyLevel,
     totalPairs,
     remainingPairs,
     isPlaying,

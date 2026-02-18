@@ -6,7 +6,10 @@
   <section class="grid">
     <article class="panel grid">
       <div class="btn-row" style="justify-content: space-between; align-items: center">
-        <div class="badge">进度：剩余 {{ store.remainingPairs }} / 总计 {{ store.totalPairs }}</div>
+        <div class="btn-row">
+          <div class="badge">进度：剩余 {{ store.remainingPairs }} / 总计 {{ store.totalPairs }}</div>
+          <div class="badge">难度：{{ DIFFICULTY_LABELS[store.difficulty] }}</div>
+        </div>
         <button class="btn btn-danger" type="button" @click="onQuitGame">退出本局</button>
       </div>
 
@@ -32,6 +35,7 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
 import GameBoard from '~/components/GameBoard.vue'
+import { DIFFICULTY_LABELS } from '~/layers/domain/valueObjects/DifficultyLevel'
 import { useGameStore } from '~/layers/presentation/stores/gameStore'
 
 const store = useGameStore()

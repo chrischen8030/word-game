@@ -334,6 +334,49 @@ a {
   color: #64748b;
 }
 
+.difficulty-progress-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.difficulty-progress-item {
+  border: 1px solid #dbe5ef;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 8px;
+}
+
+.difficulty-progress-item.active {
+  border-color: #14b8a6;
+  background: #ccfbf1;
+}
+
+.difficulty-progress-title {
+  font-size: 12px;
+  color: #475569;
+}
+
+.difficulty-progress-bar {
+  margin-top: 6px;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #e2e8f0;
+}
+
+.difficulty-progress-bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #14b8a6 0%, #0f766e 100%);
+}
+
+.difficulty-progress-meta {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #64748b;
+}
+
 .game-board {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -429,7 +472,7 @@ a {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px;
 }
 
@@ -491,5 +534,9 @@ a {
   .stats-pagination .btn {
     flex: 1 1 0;
     min-width: 0;
+  }
+
+  .difficulty-progress-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

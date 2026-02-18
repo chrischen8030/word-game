@@ -23,6 +23,32 @@
           <div class="summary-label">当前结果数</div>
           <div class="summary-value">{{ filteredItems.length }}</div>
         </div>
+
+        <div class="summary-item">
+          <div class="summary-label">当前学习等级</div>
+          <div class="summary-value">{{ DIFFICULTY_LABELS[store.userDifficultyLevel] }}</div>
+        </div>
+      </div>
+
+      <div class="grid" style="gap: 10px">
+        <div class="info">
+          等级依据“已学词条在 1~10 难度上的分布”自动估算，可用于定位当前学习阶段。
+        </div>
+
+        <div class="difficulty-progress-list">
+          <article
+            v-for="item in store.difficultyProgress"
+            :key="item.difficulty"
+            class="difficulty-progress-item"
+            :class="{ active: item.difficulty === store.userDifficultyLevel }"
+          >
+            <div class="difficulty-progress-title">Lv.{{ item.difficulty }}</div>
+            <div class="difficulty-progress-bar">
+              <span :style="{ width: `${Math.round(item.learnedRate * 100)}%` }"></span>
+            </div>
+            <div class="difficulty-progress-meta">{{ item.learnedWords }} / {{ item.totalWords }}</div>
+          </article>
+        </div>
       </div>
 
       <div class="grid stats-controls" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
@@ -63,6 +89,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import StatsTable from '~/components/StatsTable.vue'
 import type { StatisticsFilter, StatisticsSortKey } from '~/layers/application/usecases/BuildStatisticsUseCase'
+import { DIFFICULTY_LABELS } from '~/layers/domain/valueObjects/DifficultyLevel'
 import { useGameStore } from '~/layers/presentation/stores/gameStore'
 
 const store = useGameStore()

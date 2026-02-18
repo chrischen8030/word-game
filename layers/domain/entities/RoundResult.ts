@@ -1,3 +1,4 @@
+import type { DifficultyLevel } from '../valueObjects/DifficultyLevel'
 import type { GameMode } from '../valueObjects/GameMode'
 import type { Word } from './Word'
 
@@ -7,6 +8,7 @@ import type { Word } from './Word'
  */
 export interface RoundResult {
   mode: GameMode
+  difficulty: DifficultyLevel
   requestedCount: number
   correctPairs: number
   startedAt: string

@@ -17,6 +17,11 @@
         </div>
 
         <div class="summary-item">
+          <div class="summary-label">难度</div>
+          <div class="summary-value">{{ difficultyLabel }}</div>
+        </div>
+
+        <div class="summary-item">
           <div class="summary-label">正确配对</div>
           <div class="summary-value">{{ result.correctPairs }}</div>
         </div>
@@ -116,6 +121,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { DIFFICULTY_LABELS } from '~/layers/domain/valueObjects/DifficultyLevel'
 import { GAME_MODE_LABELS } from '~/layers/domain/valueObjects/GameMode'
 import { useGameStore } from '~/layers/presentation/stores/gameStore'
 
@@ -143,6 +149,17 @@ const modeLabel = computed(() => {
   }
 
   return GAME_MODE_LABELS[result.value.mode]
+})
+
+/**
+ * 难度展示文本。
+ */
+const difficultyLabel = computed(() => {
+  if (!result.value) {
+    return '-'
+  }
+
+  return DIFFICULTY_LABELS[result.value.difficulty]
 })
 
 /**
