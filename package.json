@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
-    "preview": "nuxt preview"
+    "preview": "nuxt preview",
+    "generate": "nuxt generate",
+    "deploy": "npm run generate && firebase deploy --only hosting --project default"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.11.2",
