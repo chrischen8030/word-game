@@ -32,11 +32,15 @@
         <div class="info" v-if="result.newlyLearnedWords.length === 0">
           本轮没有新增“首次学会”的单词，但复习也非常有价值。
         </div>
-        <div class="card-list" v-else>
-          <div class="word-card" v-for="word in result.newlyLearnedWords" :key="word.id">
-            {{ word.kanji }}
-            <div style="font-size: 12px; color: #64748b; margin-top: 4px">{{ word.ruby }}</div>
-          </div>
+        <div class="result-new-list" v-else>
+          <article class="result-new-item" v-for="word in result.newlyLearnedWords" :key="word.id">
+            <div class="result-new-head">
+              <strong>{{ word.kanji }}</strong>
+              <span>{{ word.ruby }}</span>
+            </div>
+            <div class="result-new-text">{{ formatMeanings(word.jpMeanings) }}</div>
+            <div class="result-new-text">{{ formatMeanings(word.zhMeanings) }}</div>
+          </article>
         </div>
       </div>
 
@@ -47,7 +51,7 @@
           当前没有可展示的词条详情。
         </div>
 
-        <div class="table-wrap" v-else>
+        <div class="table-wrap desktop-only" v-else>
           <table class="table">
             <thead>
               <tr>
@@ -70,6 +74,35 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="mobile-word-list mobile-only" v-if="roundWordDetails.length > 0">
+          <article class="mobile-word-card" v-for="word in roundWordDetails" :key="word.id">
+            <div class="mobile-word-head">
+              <strong>{{ word.kanji }}</strong>
+              <span>{{ word.ruby }}</span>
+            </div>
+
+            <div class="mobile-word-field">
+              <div class="mobile-word-label">日语意思</div>
+              <div class="mobile-word-value">{{ formatMeanings(word.jpMeanings) }}</div>
+            </div>
+
+            <div class="mobile-word-field">
+              <div class="mobile-word-label">中文意思</div>
+              <div class="mobile-word-value">{{ formatMeanings(word.zhMeanings) }}</div>
+            </div>
+
+            <div class="mobile-word-field">
+              <div class="mobile-word-label">例句</div>
+              <div class="mobile-word-value">{{ word.exampleSentence || '-' }}</div>
+            </div>
+
+            <div class="mobile-word-field">
+              <div class="mobile-word-label">例句翻译</div>
+              <div class="mobile-word-value">{{ word.exampleTranslation || '-' }}</div>
+            </div>
+          </article>
         </div>
       </div>
 

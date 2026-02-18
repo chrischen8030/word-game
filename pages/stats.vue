@@ -25,10 +25,10 @@
         </div>
       </div>
 
-      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
+      <div class="grid stats-controls" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
         <label class="form-group">
           <span class="form-label">排序</span>
-          <select v-model="sortKey" class="option-chip" style="border-radius: 10px">
+          <select v-model="sortKey" class="option-chip stats-select" style="border-radius: 10px">
             <option value="count-desc">正确次数（高到低）</option>
             <option value="count-asc">正确次数（低到高）</option>
             <option value="recent-desc">最近学习（新到旧）</option>
@@ -39,7 +39,7 @@
 
         <label class="form-group">
           <span class="form-label">筛选</span>
-          <select v-model="filterKey" class="option-chip" style="border-radius: 10px">
+          <select v-model="filterKey" class="option-chip stats-select" style="border-radius: 10px">
             <option value="learned">只看已学</option>
             <option value="all">全部</option>
             <option value="unlearned">只看未学</option>
@@ -50,7 +50,7 @@
       <div class="info" v-if="filteredItems.length === 0">当前筛选条件下暂无数据。</div>
       <StatsTable v-else :items="pagedItems" />
 
-      <div class="btn-row" v-if="totalPages > 1">
+      <div class="btn-row stats-pagination" v-if="totalPages > 1">
         <button class="btn btn-secondary" type="button" :disabled="page <= 1" @click="onPrevPage">上一页</button>
         <span class="badge">第 {{ page }} / {{ totalPages }} 页</span>
         <button class="btn btn-secondary" type="button" :disabled="page >= totalPages" @click="onNextPage">下一页</button>

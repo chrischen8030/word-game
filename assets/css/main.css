@@ -213,6 +213,14 @@ a {
   overflow-x: auto;
 }
 
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -236,6 +244,94 @@ a {
   white-space: normal;
   line-height: 1.5;
   min-width: 200px;
+}
+
+.result-new-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.result-new-item {
+  border: 1px solid #dbe5ef;
+  border-radius: 10px;
+  padding: 10px;
+  background: #f8fafc;
+}
+
+.result-new-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.result-new-head strong {
+  font-size: 18px;
+}
+
+.result-new-head span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.result-new-text {
+  margin-top: 6px;
+  color: #334155;
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.mobile-word-list {
+  display: grid;
+  gap: 10px;
+}
+
+.mobile-word-card {
+  border: 1px solid #dbe5ef;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.mobile-word-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.mobile-word-head strong {
+  font-size: 18px;
+}
+
+.mobile-word-head span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.mobile-word-field {
+  margin-top: 8px;
+}
+
+.mobile-word-label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.mobile-word-value {
+  margin-top: 2px;
+  line-height: 1.5;
+  font-size: 13px;
+  color: #334155;
+}
+
+.mobile-word-meta {
+  margin-top: 8px;
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: #64748b;
 }
 
 .game-board {
@@ -366,5 +462,34 @@ a {
 
   .page-title {
     font-size: 24px;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: grid !important;
+  }
+
+  .result-new-list {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-controls {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stats-select {
+    width: 100%;
+  }
+
+  .stats-pagination {
+    justify-content: space-between;
+  }
+
+  .stats-pagination .btn {
+    flex: 1 1 0;
+    min-width: 0;
   }
 }

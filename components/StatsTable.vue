@@ -3,7 +3,7 @@
   展示单词学习详情，供统计页复用。
 -->
 <template>
-  <div class="table-wrap">
+  <div class="table-wrap desktop-only">
     <table class="table">
       <thead>
         <tr>
@@ -30,6 +30,40 @@
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="mobile-word-list mobile-only">
+    <article class="mobile-word-card" v-for="item in items" :key="item.wordId">
+      <div class="mobile-word-head">
+        <strong>{{ item.kanji }}</strong>
+        <span>{{ item.ruby }}</span>
+      </div>
+
+      <div class="mobile-word-field">
+        <div class="mobile-word-label">日语意思</div>
+        <div class="mobile-word-value">{{ formatMeanings(item.jpMeanings) }}</div>
+      </div>
+
+      <div class="mobile-word-field">
+        <div class="mobile-word-label">中文意思</div>
+        <div class="mobile-word-value">{{ formatMeanings(item.zhMeanings) }}</div>
+      </div>
+
+      <div class="mobile-word-field">
+        <div class="mobile-word-label">例句</div>
+        <div class="mobile-word-value">{{ item.exampleSentence || '-' }}</div>
+      </div>
+
+      <div class="mobile-word-field">
+        <div class="mobile-word-label">例句翻译</div>
+        <div class="mobile-word-value">{{ item.exampleTranslation || '-' }}</div>
+      </div>
+
+      <div class="mobile-word-meta">
+        <span>累计正确：{{ item.correctCount }}</span>
+        <span>最近学习：{{ formatDateTime(item.lastCorrectAt) }}</span>
+      </div>
+    </article>
   </div>
 </template>
 
