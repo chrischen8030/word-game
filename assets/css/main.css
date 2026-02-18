@@ -225,10 +225,17 @@ a {
   padding: 10px 12px;
   text-align: left;
   font-size: 14px;
+  vertical-align: top;
 }
 
 .table th {
   background: #f8fafc;
+}
+
+.line-break {
+  white-space: normal;
+  line-height: 1.5;
+  min-width: 200px;
 }
 
 .game-board {

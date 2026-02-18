@@ -12,6 +12,10 @@ export interface WordStatisticItem {
   wordId: string
   kanji: string
   ruby: string
+  jpMeanings: string[]
+  zhMeanings: string[]
+  exampleSentence: string
+  exampleTranslation: string
   correctCount: number
   firstCorrectAt: string | null
   lastCorrectAt: string | null
@@ -28,6 +32,10 @@ function buildStatisticItem(word: Word, records: LearningRecordMap): WordStatist
     wordId: word.id,
     kanji: word.kanji,
     ruby: word.ruby,
+    jpMeanings: word.jpMeanings,
+    zhMeanings: word.zhMeanings,
+    exampleSentence: word.exampleSentence,
+    exampleTranslation: word.exampleTranslation,
     correctCount: record?.correctCount ?? 0,
     firstCorrectAt: record?.firstCorrectAt ?? null,
     lastCorrectAt: record?.lastCorrectAt ?? null,

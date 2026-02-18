@@ -8,6 +8,11 @@ import type { IWordRepository } from '../../domain/repositories/IWordRepository'
 interface RawWord {
   kanji?: string
   ruby?: string
+  level?: number
+  jp_meanings?: string[]
+  zh_meanings?: string[]
+  example_sentence?: string
+  example_translation?: string
 }
 
 /**
@@ -16,6 +21,19 @@ interface RawWord {
  */
 function containsKanji(text: string): boolean {
   return /\p{Script=Han}/u.test(text)
+}
+
+/**
+ * 规范化字符串数组字段。
+ */
+function normalizeStringArray(source: string[] | undefined): string[] {
+  if (!Array.isArray(source)) {
+    return []
+  }
+
+  return source
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0)
 }
 
 /**
@@ -41,7 +59,12 @@ function normalizeWords(source: RawWord[]): Word[] {
     normalized.push({
       id: `word-${index}`,
       kanji,
-      ruby
+      ruby,
+      level: typeof entry.level === 'number' && Number.isFinite(entry.level) ? entry.level : 10,
+      jpMeanings: normalizeStringArray(entry.jp_meanings),
+      zhMeanings: normalizeStringArray(entry.zh_meanings),
+      exampleSentence: (entry.example_sentence ?? '').trim(),
+      exampleTranslation: (entry.example_translation ?? '').trim()
     })
   })
 
