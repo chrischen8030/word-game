@@ -15,12 +15,17 @@ import { registerCorrectMatch } from '../../application/usecases/RegisterCorrect
 import { isCorrectMatch } from '../../application/usecases/ResolveMatchUseCase'
 import { selectRoundWords } from '../../application/usecases/SelectRoundWordsUseCase'
 import type { KanjiCard, RubyCard } from '../../domain/entities/GameCard'
+import type { LearningDataBackup } from '../../domain/entities/LearningDataBackup'
 import type { LearningRecordMap } from '../../domain/entities/LearningRecord'
 import type { RoundResult } from '../../domain/entities/RoundResult'
 import type { Word } from '../../domain/entities/Word'
 import type { ILearningRecordRepository } from '../../domain/repositories/ILearningRecordRepository'
 import type { IWordRepository } from '../../domain/repositories/IWordRepository'
-import { DEFAULT_DIFFICULTY_LEVEL, type DifficultyLevel } from '../../domain/valueObjects/DifficultyLevel'
+import {
+  DEFAULT_DIFFICULTY_LEVEL,
+  normalizeDifficultyLevel,
+  type DifficultyLevel
+} from '../../domain/valueObjects/DifficultyLevel'
 import type { GameMode } from '../../domain/valueObjects/GameMode'
 import { StaticWordRepository } from '../../infrastructure/data/StaticWordRepository'
 import { LocalStorageLearningRecordRepository } from '../../infrastructure/storage/LocalStorageLearningRecordRepository'
@@ -379,6 +384,44 @@ export const useGameStore = defineStore('game-store', () => {
     return buildStatistics(words.value, records.value, sortKey, filter)
   }
 
+  /**
+   * 导出当前本地学习数据。
+   * 用于“同步到 Firebase”前的载荷生成。
+   */
+  function exportLearningData(): LearningDataBackup {
+    ensureInitialized()
+
+    return {
+      schemaVersion: '1.0.0',
+      exportedAt: new Date().toISOString(),
+      gameConfig: {
+        mode: mode.value,
+        requestedCount: requestedCount.value,
+        difficulty: difficulty.value
+      },
+      summary: {
+        learnedWordCount: learnedWordCount.value,
+        totalWordCount: totalWordCount.value
+      },
+      records: JSON.parse(JSON.stringify(records.value)) as LearningRecordMap
+    }
+  }
+
+  /**
+   * 用外部备份覆盖本地学习数据。
+   * 注意：该操作会替换本地 records，不做合并。
+   */
+  function importLearningData(backup: LearningDataBackup): void {
+    ensureInitialized()
+
+    mode.value = backup.gameConfig.mode === 'review' ? 'review' : 'newbie'
+    requestedCount.value = Math.max(1, Math.floor(backup.gameConfig.requestedCount || 10))
+    difficulty.value = normalizeDifficultyLevel(backup.gameConfig.difficulty)
+    records.value = JSON.parse(JSON.stringify(backup.records || {})) as LearningRecordMap
+
+    persistRecords()
+  }
+
   return {
     mode,
     requestedCount,
@@ -407,6 +450,8 @@ export const useGameStore = defineStore('game-store', () => {
     quitRound,
     clearRoundResult,
     replayLastRound,
-    getStatistics
+    getStatistics,
+    exportLearningData,
+    importLearningData
   }
 })
